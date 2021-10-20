@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+
+    game:
+        build:
+            context: .
+        command: sh -c "python manage.py collectstatic --no-input && python manage.py makemigrations && python manage.py migrate && daphne -b ${APP_HOST} -p ${APP_PORT} game.asgi:application"
+        container_name: game
+        expose:
+            - "${APP_PORT}"
+        hostname: ${APP_HOST}
+        image: game-image
+        restart: on-failure
+        network_mode: "host"
+
+    redis:
+        container_name: 'redis'
+        image: 'redis:6.2.5-alpine'
+        ports:
+          - '127.0.0.1:6379:6379'
+        restart: on-failure
+
+volumes:
+    redisdata:

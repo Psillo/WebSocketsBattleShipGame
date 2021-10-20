@@ -1,0 +1,54 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="{% static 'js/uikit.min.js' %}"></script>
+    <script src="{% static 'js/uikit-icons.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/uikit.min.css' %}" />
+</head>
+
+<body>
+    <div class="uk-section uk-section-muted uk-flex uk-flex-middle uk-animation-fade" uk-height-viewport>
+        <div class="uk-width-1-1">
+            <div class="uk-container">
+                <div class="uk-grid-margin uk-grid uk-grid-stack" uk-grid>
+                    <div class="uk-width-1-1@m">
+                        <div
+                            class="uk-margin uk-width-large uk-margin-auto uk-card uk-card-default uk-card-body uk-box-shadow-large">
+                            <h3 class="uk-card-title uk-text-center">Привет!</h3>
+                            <form method="post" action="{% url 'master:login' %}">
+                                {% csrf_token %}
+                                <div class="uk-margin">
+                                    <table>
+                                        <tr>
+                                            <td>{{ form.username.label_tag }}</td>
+                                            <td>{{ form.username }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>{{ form.password.label_tag }}</td>
+                                            <td>{{ form.password }}</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="uk-margin">
+                                    <input type="submit" value="login"
+                                        class="uk-button uk-button-primary uk-button-large uk-width-1-1">
+                                    <input type="hidden" name="next" value="{{ next }}">
+                                </div>
+                            </form>
+                            <div class="uk-text-small uk-text-center">
+                                Не зареган? <a href="{% url 'master:register' %}">Создать аккаунт.</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

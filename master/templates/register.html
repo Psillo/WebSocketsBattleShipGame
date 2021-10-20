@@ -1,0 +1,30 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="{% static 'js/uikit.min.js' %}"></script>
+    <script src="{% static 'js/uikit-icons.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/uikit.min.css' %}" />
+</head>
+
+<body>
+    <div class="uk-container">
+        <div class="uk-flex uk-flex-center">
+            <div class="uk-card uk-card-default uk-card-hover uk-card-body uk-width-large">
+                <h3>Register</h3>
+                <form action="." method="post">
+                    {{ user_form.as_p }}
+                    {% csrf_token %}
+                    <p><input type="submit" value="Создать аккаунт." class="uk-button uk-button-primary uk-width-1-1">
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

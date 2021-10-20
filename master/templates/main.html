@@ -1,0 +1,103 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="{% static 'js/vue.js' %}"></script>
+    <script src="{% static 'js/vuex.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+    <script src="{% static 'js/uikit.min.js' %}"></script>
+    <script src="{% static 'js/uikit-icons.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/uikit.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/game.css' %}">
+</head>
+
+<body>
+    <input type="hidden" id='username' value="{{ user }}">
+    <input type="hidden" id='user_hash' value="{{ user_hash }}">
+    <div id="app">
+        <div class="uk-inline">
+            <img src="{% static 'img/photo.jpg' %}" alt="">
+            {% verbatim %}
+            <div
+                class="uk-position-top-left uk-overlay uk-overlay-default uk-child-width-expand uk-padding-remove-vertical">
+                <div v-if="room_guest != null">
+                    <div v-if="game_started === true" class="">
+                        <table class="uk-table uk-table-small uk-table-divider">
+                            <tbody>
+                                <tr v-for="posy in y" :key="posy">
+                                    <td @click="shot('cell_'+posx+posy);" v-for="posx in x" :key="posx"
+                                        class='uk-box-shadow-hover-small uk-text-center' :ref="'enemy_cell_'+posx+posy">
+                                        {{ posx+posy }}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="uk-position-top-center uk-overlay uk-overlay-default uk-margin-remove uk-padding-remove">
+                <div v-if="room_guest === null">
+                    <button @click="findRoom" class="uk-button uk-button-primary uk-button-small">Войти.</button>
+                </div>
+                <div v-if="room_guest != null">
+                    <button @click="exitRoom" class="uk-button uk-button-danger uk-button-small">Покинуть
+                        комнату.</button>
+                </div>
+            </div>
+            <div
+                class="uk-position-top-right uk-overlay uk-overlay-default uk-child-width-expand uk-padding-remove-vertical">
+                <div v-if="room_guest != null">
+                    <div v-if='room_member != null && room_guest != null' class="">
+                        <p v-if="player_ready === false" class="uk-text-center">Выберите расположение
+                            {{ selected_cells }}
+                            кораблей</p>
+                        <p v-if="player_ready === true" class="uk-text-center">Ваше поле</p>
+                        <table class="uk-table uk-table-small uk-table-divider">
+                            <tbody>
+                                <tr v-for="posy in y" :key="posy">
+                                    <td @click="setShipPosition('cell_'+posx+posy);" v-for="posx in x" :key="posx"
+                                        class='uk-box-shadow-hover-small uk-text-center' :ref="'cell_'+posx+posy">
+                                        {{ posx+posy }}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div v-if="room_guest != null"
+                class="uk-position-bottom-center uk-overlay uk-margin-remove uk-padding-remove" style="height: 500px">
+                <div class="uk-panel uk-panel-scrollable uk-width-medium" style="height: 370px">
+                    <div v-if="messages_list != 'None'" v-for="message in messages_list" :key="message['id']"
+                        style="height: 68px">
+                        <div v-bind:class="[user === message['sender'] ? 'uk-float-right' : 'uk-float-left']" uk-grid>
+                            <div>
+                                <div
+                                    v-bind:class="[user === message['sender'] ? 'uk-card uk-card-body uk-card-small uk-card-default uk-border-rounded' : 'uk-card uk-card-body uk-card-small uk-card-primary uk-border-rounded']">
+                                    <p class="uk-margin-remove">{{ message['message'] }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="uk-width-expand uk-position-bottom-center">
+                    <div class="">
+                        <textarea v-model="message" class="uk-width-large uk-textarea uk-margin" rows="1"
+                            placeholder="Введите сообщение"></textarea>
+                        <div class="uk-text-center">
+                            <button @click="sendMessage"
+                                class="uk-button uk-button-danger uk-button-small uk-margin">Отправить.</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endverbatim %}
+        </div>
+    </div>
+</body>
+
+</html>

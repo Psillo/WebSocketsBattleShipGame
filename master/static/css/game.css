@@ -1,0 +1,316 @@
+@import url("https://fonts.googleapis.com/css?family=Josefin+Sans");
+html,
+body {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  perspective: 2500px;
+  transform-style: preserve-3d;
+  overflow: hidden;
+  font-family: "Josefin Sans", sans-serif;
+  transition: 0.1s ease;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+.game-field {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transition: 0.3s ease;
+  transform: translateX(-50%) translateY(-50%) rotateY(10deg) rotateX(70deg) rotateZ(-45deg);
+  transform-style: preserve-3d;
+}
+.game-field__flat {
+  transform: translateX(-50%) translateY(-50%) translateZ(-200px) rotateY(0deg) rotateX(0deg) rotateZ(0deg);
+}
+.game-field__cell {
+  float: left;
+  position: relative;
+  display: block;
+  transform-style: preserve-3d;
+  transition: 0.3s ease;
+  cursor: pointer;
+}
+.game-field__cell--action-field:hover {
+  border-color: #f00 !important;
+}
+.game-field__box-part {
+  transform-origin: 0 0;
+  position: absolute;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.game-field__smoke {
+  position: absolute;
+  transform-style: preserve-3d;
+  transform-origin: 0 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #000;
+  transform: rotateX(90deg) rotateY(25deg) translateZ(200px) translateX(-50%) translateY(-50%);
+  top: 50%;
+  left: 50%;
+}
+.game-field__box-part--front {
+  background-color: rgba(155, 15, 0, 0.2);
+  transform-style: preserve-3d;
+}
+.game-field__box-part--front:before {
+  content: "";
+  position: absolute;
+  transform-origin: 0 50%;
+  transform: translateX(25px) translateY(25px) rotateY(-90deg);
+  width: 30px;
+  height: 5px;
+  background-color: #555;
+}
+.game-field__box-part--front:after {
+  content: "";
+  position: absolute;
+  transform-origin: 0 50%;
+  transform: translateX(25px) translateY(25px) rotateY(-90deg) rotateX(-90deg);
+  width: 30px;
+  height: 5px;
+  background-color: #aaa;
+}
+.game-field__box-part--left {
+  transform-origin: 0 0;
+  transform: rotateY(-90deg);
+  background-color: #ff1914;
+}
+.game-field__box-part--right {
+  transform-origin: 0 0;
+  background-color: #9b9b00;
+}
+.game-field__box-part--top {
+  transform-origin: 0 0;
+  background-color: #9b3700;
+}
+.game-field__box-part--bottom {
+  transform-origin: 0 0;
+  background-color: lime;
+}
+
+.enemyTargetContainer {
+  width: 100px;
+  height: 100px;
+  position: absolute;
+  left: 20px;
+  top: 20px;
+  z-index: 90;
+  cursor: pointer;
+}
+.enemyTargetContainer__tooltipe {
+  position: absolute;
+  width: 110px;
+  background-color: #fff;
+  top: 10%;
+  right: -130%;
+  z-index: 100;
+  box-shadow: 1px 1px 10px #aaa;
+  font-family: monospace;
+  padding: 0.5em 0.8em;
+  display: none;
+}
+.enemyTargetContainer__tooltipe:before {
+  content: "";
+  position: absolute;
+  display: block;
+  width: 10px;
+  height: 10px;
+  left: -5px;
+  top: 9px;
+  background-color: #fff;
+  transform: rotate(45deg);
+  box-shadow: 1px 1px 10px #aaa;
+  z-index: 99;
+}
+.enemyTargetContainer__tooltipe:after {
+  content: "";
+  position: absolute;
+  height: 100%;
+  width: 10px;
+  background-color: #fff;
+  left: 0;
+  top: 0;
+  z-index: 100;
+}
+.enemyTargetContainer__tooltipe--is-active {
+  animation: bounce 1s ease infinite;
+  display: block;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(10px);
+  }
+}
+.action-field {
+  opacity: 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.9);
+  z-index: -10;
+  transition: 0.3s ease;
+}
+.action-field__body {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 600px;
+  height: 600px;
+  width: 100%;
+}
+.action-field__body:after {
+  content: "";
+  display: table;
+  width: 100%;
+  height: 0;
+  clear: both;
+}
+.action-field--is-active {
+  opacity: 1;
+  z-index: 10000;
+}
+.action-field__close-btn {
+  position: absolute;
+  right: 1em;
+  top: 1em;
+  cursor: pointer;
+}
+.action-field__close-btn:hover svg {
+  fill: red;
+}
+
+@media screen and (max-width: 600px) {
+  .action-field__body {
+    height: 100vw;
+  }
+}
+.info-banner {
+  position: absolute;
+  font-size: 0.9em;
+  top: 120px;
+  left: 1.4em;
+  width: 100px;
+}
+.info-banner div {
+  border-bottom: 1px dashed #aaa;
+  margin-top: 0.5em;
+}
+.info-banner p {
+  font-family: monospace;
+  margin: 0;
+}
+.info-banner p:nth-child(1) span {
+  color: #E53935;
+}
+.info-banner span {
+  float: right;
+  color: #4CAF50;
+}
+
+.f-banner {
+  background-color: white;
+}
+.f-banner__close {
+  position: absolute;
+  top: 1em;
+  right: 1em;
+  cursor: pointer;
+}
+.f-banner__close svg {
+  transition: 0.3s ease;
+}
+.f-banner__close:hover svg path {
+  fill: red;
+}
+.f-banner__body {
+  max-width: 600px;
+  width: 100%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.f-banner__body p {
+  color: #fff;
+  text-align: center;
+  font-size: 1.5em;
+  position: absolute;
+  width: 100%;
+  text-transform: uppercase;
+  z-index: 100;
+  margin: 0;
+}
+.f-banner__body img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: auto;
+  box-shadow: 2px 2px 10px #555;
+}
+.f-banner__btn {
+  position: absolute;
+  top: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #FF5252;
+  border: none;
+  width: 200px;
+  height: 40px;
+  border-radius: 3px;
+  color: #fff;
+  font-size: 1.1em;
+  transition: 0.3s ease;
+  cursor: pointer;
+}
+.f-banner__btn:hover {
+  background-color: #FF1744;
+}
+.f-banner--is-active {
+  opacity: 1;
+  z-index: 10000;
+}
+
+.shot-banner {
+  position: fixed;
+  width: 150px;
+  height: 70px;
+  background-color: #fff;
+  bottom: 100px;
+  left: -160px;
+  box-shadow: 2px 2px 10px #aaa;
+  border-radius: 3px;
+  transition: 0.3s ease;
+}
+.shot-banner__user {
+  bottom: 180px;
+}
+.shot-banner--is-active {
+  transform: translateX(180px);
+}
+.shot-banner p {
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  line-height: 70px;
+  padding: 0;
+  margin: 0;
+}

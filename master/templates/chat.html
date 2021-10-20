@@ -1,0 +1,206 @@
+{% verbatim %}
+<div class="uk-flex uk-flex-right uk-margin-left" id='robot_links_list_body'>
+    <div class="uk-card uk-card-default uk-card-body uk-width-expand" uk-height-match="#custom_links_list_body">
+        <p class="uk-text-lead uk-text-center uk-margin-small">Список ссылок созданных роботом</p>
+        <form class="uk-flex uk-flex-center">
+            <div class="uk-inline">
+                <a class="uk-form-icon uk-form-icon-flip" uk-icon="settings" uk-tooltip="Настройки поиска"></a>
+                <div uk-dropdown="mode: click">
+                    <div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
+                        <label><input class="uk-radio" type="radio" checked value="По названию"
+                                v-model="robot_search_links_by"> По ID</label>
+                        <label><input class="uk-radio" type="radio" value="По сокращённой ссылке"
+                                v-model="robot_search_links_by"> По ссылке</label>
+                        <label><input class="uk-radio" type="radio" value="По дате" v-model="robot_search_links_by">
+                            По дате</label>
+                        <label><input class="uk-radio" type="radio" value="По количеству переходов"
+                                v-model="robot_search_links_by"> По переходам</label>
+                        <label><input class="uk-radio" type="radio" value="По действию" v-model="robot_search_links_by">
+                            По действию</label>
+                        <label><input class="uk-radio" type="radio" value="По статусу действия"
+                                v-model="robot_search_links_by"> По статусу</label>
+                        <label><input class="uk-radio" type="radio" value="По сущности" v-model="robot_search_links_by">
+                            По сущности</label>
+                    </div>
+                </div>
+                <input v-if="robot_search_links_by != 'По дате'" class="uk-input uk-width-large uk-form-medium"
+                    type="text" v-model="robot_search_links" @input.self="searchRobotLinks" placeholder="Поиск">
+                <input v-if="robot_search_links_by === 'По дате'" class="uk-input uk-width-large uk-form-medium"
+                    type="text" v-model="robot_search_links" @input.self="searchRobotLinks" placeholder="02.11.2030">
+            </div>
+        </form>
+        <form>
+            <div class="uk-flex uk-flex-center uk-margin-small-top">
+                <label class="uk-form-label uk-margin-small-right uk-text-small" for="form-stacked-select">Сортировать
+                    по:</label>
+                <div class="uk-form-controls">
+                    <select class="uk-select uk-form-width-small uk-form-small uk-text-small"
+                        v-model="robot_links_order_by" @change="pageCounter('robot', 'init', robot_page_count);">
+                        <option value='uid'>ID</option>
+                        <option value='date'>Дате</option>
+                        <option value='count'>Переходам</option>
+                        <option value='action'>Действию</option>
+                        <option value='action_params'>Параметрам</option>
+                        <option value='action_status'>Статусу</option>
+                        <option value='entity'>Сущности</option>
+                    </select>
+                    <select class="uk-select uk-form-width-small uk-form-small uk-text-small"
+                        v-model="robot_links_order_by_" @change="pageCounter('robot', 'init', robot_page_count);">
+                        <option value=''>Возрастанию</option>
+                        <option value='-'>Убыванию</option>
+                    </select>
+                </div>
+            </div>
+        </form>
+        <div class="uk-card uk-card-default uk-card-body uk-width-expand uk-margin-small-top uk-margin-small-bottom uk-padding-small"
+            style="height: 345px">
+            <div class="uk-position-center" id="robot_spinner_table" uk-spinner></div>
+            <table v-if="loaded === 1"
+                class="uk-table uk-table-divider uk-table-small">
+                <thead>
+                    <tr>
+                        <th class="uk-text-center">Ссылка</th>
+                        <th class="uk-text-center">Переходы</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="uk-text-center" v-for="link in robot_links_list" :key="link.uid">
+                        <td class="uk-text-truncate"><a v-if="link.uid != 'Ссылок нет.'"
+                                v-bind:href="'http://localhost:8000/' + link.uid">{{ link.uid }}</a>
+                            <p v-if="link.uid === 'Ссылок нет.'">
+                                {{ link.uid }}</p>
+                        </td>
+                        <td class="uk-text-truncate">{{ link.count }}</td>
+                        <td v-if="link.uid != 'Ссылок нет.'">
+                            <div class="uk-inline">
+                                <a uk-icon="more" uk-tooltip="Дополнительная информация"></a>
+                                <div uk-dropdown="mode: click">
+                                    <table
+                                        class="uk-table uk-table-divider uk-table-small uk-table-responsive uk-table-justify">
+                                        <thead>
+                                            <tr>
+                                                <th class="uk-table-shrink uk-text-center">Ссылка</th>
+                                                <th class="uk-table-shrink uk-text-center">QR-код</th>
+                                                <th class="uk-table-shrink uk-text-center">Дата создания
+                                                </th>
+                                                <th class="uk-table-shrink uk-text-center">Действие</th>
+                                                <th class="uk-table-shrink uk-text-center">Сущность</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td class="uk-text-center"><a v-bind:href="link.link"
+                                                        uk-icon="link"></a>
+                                                </td>
+                                                <td class="uk-text-center"><a
+                                                        v-bind:href="'http://localhost:8000/' + link.uid + '?qr'"
+                                                        uk-icon="download"></a></td>
+                                                <td class="uk-text-center">{{ link.date }}</td>
+                                                <td class="uk-text-center">{{ link.action }}</td>
+                                                <td><a v-bind:href="link.entity_link">{{ link.entity }}</a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <table
+                                        class="uk-table uk-table-divider uk-table-small uk-table-responsive uk-table-justify uk-table-middle">
+                                        <thead>
+                                            <tr>
+                                                <th v-if="link.action != 'Без действия' && link.action_for_each != 'Да'"
+                                                    class="uk-table-shrink uk-text-center">Статус действия
+                                                </th>
+                                                <th v-if="link.action != 'Без действия'"
+                                                    class="uk-table-shrink uk-text-center">Параметр</th>
+                                                <th v-if="link.action != 'Без действия'"
+                                                    class="uk-table-shrink uk-text-center">Значение
+                                                    параметра</th>
+                                                <th v-if="link.action != 'Без действия'"
+                                                    class="uk-table-shrink uk-text-center">Повтор действия
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td v-if="link.action != 'Без действия' && link.action_for_each != 'Да'"
+                                                    class="uk-text-center">{{ link.action_status }}</td>
+                                                <td v-if="link.action != 'Без действия'" class="uk-text-center">
+                                                    {{ link.action_param }}</td>
+                                                <td v-if="link.action != 'Без действия'" class="uk-text-center">
+                                                    {{ link.action_param_value }}
+                                                </td>
+                                                <td v-if="link.action != 'Без действия'" class="uk-text-center">
+                                                    {{ link.action_for_each }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="uk-inline">
+                                <a class="uk-margin-left" uk-icon="trash" uk-tooltip="Удалить ссылку"></a>
+                                <div uk-dropdown="pos: bottom-justify; mode: click">
+                                    <ul class="uk-nav uk-dropdown-nav">
+                                        <li class="uk-disabled">
+                                            <p class="uk-text-center uk-margin-small">Уверены?</p>
+                                        </li>
+                                        <li><button class="uk-button uk-button-danger uk-button-small"
+                                                @click="deleteRobotLink($event, link.uid);">Да</button>
+                                            <button
+                                                class="uk-button uk-button-primary uk-button-small uk-dropdown-close">Нет</button>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <ul v-if="robot_search_links === ''" class="uk-pagination uk-position-bottom-center uk-margin" uk-margin>
+                <li><a href="#" v-bind:class="[robot_page_count > 1 ? 'uk-active' : 'uk-disabled']"
+                        @click="pageCounter('robot', 'first', robot_page_count);"><span
+                            uk-pagination-previous></span><span uk-pagination-previous></span></a></li>
+                <li><a href="#" v-bind:class="[robot_page_count > 1 ? 'uk-active' : 'uk-disabled']"
+                        @click="pageCounter('robot', 'previous', robot_page_count);"><span
+                            uk-pagination-previous></span></a></li>
+                <li v-bind:class="[active_robot_links_list_pagination_element(page) ? 'uk-active' : 'uk-disabled']"
+                    v-for="page in robot_links_page_range" :key="page">
+                    <a href="#" @click.self="pageCounter('robot', 'init', page);">{{ page }}</a>
+                </li>
+                <li><a href="#" v-bind:class="[robot_page_count != robot_links_num_pages ? 'uk-active' : 'uk-disabled']"
+                        @click="pageCounter('robot', 'next', robot_page_count);"><span uk-pagination-next></span></a>
+                </li>
+                <li><a href="#" v-bind:class="[robot_page_count != robot_links_num_pages ? 'uk-active' : 'uk-disabled']"
+                        @click="pageCounter('robot', 'last', robot_page_count);"><span uk-pagination-next></span><span
+                            uk-pagination-next></span></a></li>
+            </ul>
+            <ul v-if="robot_search_links != ''" class="uk-pagination uk-position-bottom-center uk-margin" uk-margin>
+                <li><a href="#" v-bind:class="[robot_page_count > 1 ? 'uk-active' : 'uk-disabled']"
+                        @click="pageCounter('search_robot', 'first', robot_page_count);"><span
+                            uk-pagination-previous></span><span uk-pagination-previous></span></a></li>
+                <li><a href="#" v-bind:class="[robot_page_count > 1 ? 'uk-active' : 'uk-disabled']"
+                        @click="pageCounter('search_robot', 'previous', robot_page_count);"><span
+                            uk-pagination-previous></span></a></li>
+                <li v-bind:class="[active_robot_links_list_pagination_element(page) ? 'uk-active' : 'uk-disabled']"
+                    v-for="page in robot_links_page_range" :key="page">
+                    <a href="#" @click.self="pageCounter('search_robot', 'init', page);">{{ page }}</a>
+                </li>
+                <li><a href="#" v-bind:class="[robot_page_count != robot_links_num_pages ? 'uk-active' : 'uk-disabled']"
+                        @click="pageCounter('search_robot', 'next', robot_page_count);"><span
+                            uk-pagination-next></span></a>
+                </li>
+                <li><a href="#" v-bind:class="[robot_page_count != robot_links_num_pages ? 'uk-active' : 'uk-disabled']"
+                        @click="pageCounter('search_robot', 'last', robot_page_count);"><span
+                            uk-pagination-next></span><span uk-pagination-next></span></a></li>
+            </ul>
+            <div class="uk-position-bottom-center">
+                <div uk-form-custom="target: > * > span:first-child">
+                    <select v-model="robot_page_count" @change="pageCounter('robot', 'init', robot_page_count);">
+                        <option v-for="page in robot_links_page_range" :key="page">{{ page }}</option>
+                    </select>
+                    <span class="uk-margin-small" uk-icon="icon: chevron-down"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endverbatim %}
