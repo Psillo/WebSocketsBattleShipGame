@@ -93,7 +93,7 @@ STATIC_ROOT = path.join(BASE_DIR, 'staticfiles')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGIN_REDIRECT_URL = '/main/'
+LOGIN_REDIRECT_URL = '/'
 
 REDIS_HOST = config('REDIS_HOST')
 REDIS_PORT = config('REDIS_PORT', cast=int)
